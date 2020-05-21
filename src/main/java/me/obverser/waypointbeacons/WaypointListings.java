@@ -55,10 +55,10 @@ public class WaypointListings implements InventoryHolder {
         // Adding the navigation items if necessary.
         if (wloc.size() > 45) {
             if (page > 0) {
-                wloc.set(45, previousItem);
+                GUI.setItem(45, previousItem);
             }
             if (page < wloc.size() / 45) {
-                wloc.set(53, nextItem);
+                GUI.setItem(53, nextItem);
             }
         }
         // Adding the items to the GUI, breaks when there are none left.
