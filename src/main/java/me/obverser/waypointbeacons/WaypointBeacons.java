@@ -37,6 +37,7 @@ public final class WaypointBeacons extends JavaPlugin implements Listener {
     Inventory nameGUI; // Creating the Beacon Name GUI (Not yet added)
     WaypointListings availableWaypoints = new WaypointListings(); // Referencing the other java file, creating a paged list for the waypoints.
     Inventory conditionalWaypoints; // Creating a conditional waypoint holder, for "availableWaypoints." This is so I can check if the player is interacting with the right GUI.
+    private Location interactedBlockLocation;
 
     public void createBeaconInventory() { // Creating the inventories, run on onEnable()
         // Creating Beacon GUI
@@ -86,7 +87,7 @@ public final class WaypointBeacons extends JavaPlugin implements Listener {
                 plr.openInventory(conditionalWaypoints);
             } else {
                 // The teleportation. Will add some pizzaz here later, maybe even a range--who knows.
-                Location toLoc = getConfig().getLocation("waypoints." + clickedItem.getItemMeta().getDisplayName()).clone().add(0.5, 1, 0.5);
+                Location toLoc = getConfig().getLocation("waypoints." + clickedItem.getItemMeta().getDisplayName() + ".Location").clone().add(0.5, 1, 0.5);
                 plr.teleport(toLoc);
             }
         }
@@ -151,7 +152,7 @@ public final class WaypointBeacons extends JavaPlugin implements Listener {
                     }
                 }
                 // Saving to config.
-                getConfig().set("waypoints." + name, beaconLocation);
+                getConfig().set("waypoints." + name + ".Location", beaconLocation);
                 saveConfig();
             }
         }
@@ -167,7 +168,7 @@ public final class WaypointBeacons extends JavaPlugin implements Listener {
             // We don't want to waste any resources, more than this plugin already takes up.
             if (listOfWaypoints == null) return;
             for (Object key : listOfWaypoints) {
-                if (blk.getLocation().equals(getConfig().getLocation("waypoints." + key))) {
+                if (blk.getLocation().equals(getConfig().getLocation("waypoints." + key + ".Location"))) {
                     // Removing the beacon from config.
                     getConfig().set("waypoints." + key, null);
                     saveConfig();
@@ -196,9 +197,10 @@ public final class WaypointBeacons extends JavaPlugin implements Listener {
                 if (listOfWaypoints == null) return;
                 for (Object key : listOfWaypoints) {
                     // Disabling the default beacon GUI and opening the custom GUI.
-                    if (event.getClickedBlock().getLocation().equals(getConfig().getLocation("waypoints." + key))) {
+                    if (event.getClickedBlock().getLocation().equals(getConfig().getLocation("waypoints." + key + ".Location"))) {
                         event.setCancelled(true);
                         plr.openInventory(beaconGUI);
+                        
                     }
                 }
             }
