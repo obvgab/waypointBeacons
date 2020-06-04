@@ -61,6 +61,7 @@ public final class WaypointBeaconsRework extends JavaPlugin implements Listener 
             Material tempMaterial = Material.getMaterial(getConfig().getString("settings.recipe.recipeItems." + recipeItem.toString()));
             wayRecipe.setIngredient(recipeItem.toString().toCharArray()[0], tempMaterial);
         }
+        // TODO: this is reload-unfriendly.  Run `Bukkit.removeRecipe(wayRecipe)` in onDisable().
         Bukkit.addRecipe(wayRecipe);
         WaypointCommands waypointCommandScript = new WaypointCommands();
         waypointCommandScript.getPlugin(plugin, this);
