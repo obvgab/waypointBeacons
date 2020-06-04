@@ -66,7 +66,21 @@ public class WaypointCommands implements Listener, CommandExecutor {
                     return true;
                 }
             }
+
+            if (args.length == 0) {
+                // TODO put usage
+                sender.sendMessage("TODO put usage");
+                return true;
+            }
+
             if (args[0].equalsIgnoreCase("remove")) {
+                if (args.length < 2) {
+
+                    // TODO put usage
+                    sender.sendMessage("TODO put usage");
+
+                    return true;
+                }
                 try {
                     plugin.getConfig().set("waypoints." + args[1], null);
                     plugin.saveConfig();
@@ -81,6 +95,13 @@ public class WaypointCommands implements Listener, CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("giveBlock")) {
+                if (args.length < 2) {
+
+                    // TODO put usage
+                    sender.sendMessage("TODO put usage");
+
+                    return true;
+                }
                 ItemStack wayBeacon = new ItemStack(Material.BEACON, 1);
                 ItemMeta wayBeaconMeta = wayBeacon.getItemMeta();
                 wayBeaconMeta.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "Waypoint Beacon");
@@ -99,6 +120,13 @@ public class WaypointCommands implements Listener, CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("settings")) {
+                if (args.length < 3) {
+
+                    // TODO put usage
+                    sender.sendMessage("TODO put usage");
+
+                    return true;
+                }
                 try {
                     if (args[3].equalsIgnoreCase("string")) {
                         String tempVarSettings = args[2].toString();
@@ -125,6 +153,13 @@ public class WaypointCommands implements Listener, CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("forcePublic")) {
+                if (args.length < 2) {
+
+                    // TODO put usage
+                    sender.sendMessage("TODO put usage");
+
+                    return true;
+                }
                 try {
                     plugin.getConfig().set("waypoints." + args[1] + ".Access.isPublic", true);
                     plugin.saveConfig();
@@ -138,6 +173,13 @@ public class WaypointCommands implements Listener, CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("forceName")) {
+                if (args.length < 3) {
+
+                    // TODO put usage
+                    sender.sendMessage("TODO put usage");
+
+                    return true;
+                }
                 try {
                     copyConfigSection(plugin.getConfig(), "waypoints." + args[1], "waypoints." + args[2]);
                     plugin.getConfig().set("waypoints." + args[1], null);
@@ -152,6 +194,13 @@ public class WaypointCommands implements Listener, CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("forceDisplay")) {
+                if (args.length < 3) {
+
+                    // TODO put usage
+                    sender.sendMessage("TODO put usage");
+
+                    return true;
+                }
                 try {
                     plugin.getConfig().set("waypoints." + args[1] + ".Display", args[2]);
                     plugin.saveConfig();
