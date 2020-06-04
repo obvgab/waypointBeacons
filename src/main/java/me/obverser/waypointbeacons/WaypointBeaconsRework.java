@@ -15,14 +15,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class WaypointBeaconsRework extends JavaPlugin implements Listener {
-
-    Plugin plugin = this;
     List<InventoryListeners> listOfListeners = new ArrayList<InventoryListeners>();
 
     public void reloadAllListenersRadius() {
@@ -64,7 +61,7 @@ public final class WaypointBeaconsRework extends JavaPlugin implements Listener 
         // TODO: this is reload-unfriendly.  Run `Bukkit.removeRecipe(wayRecipe)` in onDisable().
         Bukkit.addRecipe(wayRecipe);
         WaypointCommands waypointCommandScript = new WaypointCommands();
-        waypointCommandScript.getPlugin(plugin, this);
+        waypointCommandScript.getPlugin(this, this);
         getCommand("waypoints").setExecutor(waypointCommandScript);
     }
 
@@ -83,7 +80,7 @@ public final class WaypointBeaconsRework extends JavaPlugin implements Listener 
                         ItemMeta tempMeta = tempTeleport.getItemMeta();
                         tempMeta.setDisplayName(ChatColor.GOLD + "Teleport To...");
                         tempTeleport.setItemMeta(tempMeta);
-                        temporaryListener.establishVars(plugin, event.getPlayer(), event.getClickedBlock(), tempTeleport, this);
+                        temporaryListener.establishVars(this, event.getPlayer(), event.getClickedBlock(), tempTeleport, this);
                         getServer().getPluginManager().registerEvents(temporaryListener, this);
                         listOfListeners.add(temporaryListener);
                     }
