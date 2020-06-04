@@ -1,0 +1,17 @@
+settings:
+    commandsEnabled: true
+    radius:
+        radiusEnabled: true
+        value: 30
+    recipe:
+        recipeFormat:
+            line1: "ENE"
+            line2: "GBG"
+            line3: "OOO"
+        recipeItems:
+            O: "OBSIDIAN"
+            G: "GLASS"
+            B: "BEACON"
+            E: "ENDER_PEARL"
+            N: "BLAZE_POWDER"
+waypoints: {}
