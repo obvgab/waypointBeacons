@@ -1,6 +1,0 @@
-name: WaypointBeacons
-version: ${project.version}
-main: me.obverser.waypointbeacons.WaypointBeacons
-api-version: 1.13
-authors: [Gabe10611]
-description: A beacon based, rpg-like waypoint system.
