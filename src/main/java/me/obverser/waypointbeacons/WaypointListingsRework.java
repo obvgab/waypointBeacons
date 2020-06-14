@@ -3,6 +3,7 @@ package me.obverser.waypointbeacons;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -14,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class WaypointListingsRework implements InventoryHolder {
@@ -46,27 +48,28 @@ public class WaypointListingsRework implements InventoryHolder {
         plugin.getConfig().getConfigurationSection("waypoints").getKeys(false).forEach(key -> {
             ItemStack tempItem = new ItemStack(Material.getMaterial(plugin.getConfig().getString("waypoints." + key.toString() + ".Display")), 1);
             ItemMeta tempMeta = tempItem.getItemMeta();
-            tempMeta.setDisplayName(key.toString());
+            tempMeta.setDisplayName(key.toString().replaceAll("%_", " "));
             Location tempLocation = plugin.getConfig().getLocation("waypoints." + key + ".Location");
             if (!(tempLocation == null)) {
-                tempMeta.setLore(Arrays.asList("X : " + tempLocation.getBlockX(), "Y : " + tempLocation.getBlockY(), "Z : " + tempLocation.getBlockZ()));
+                OfflinePlayer tempPlayer = Bukkit.getOfflinePlayer(UUID.fromString(plugin.getConfig().getString("waypoints." + key + ".Access.Owner")));
+                tempMeta.setLore(Arrays.asList("X : " + tempLocation.getBlockX(), "Y : " + tempLocation.getBlockY(), "Z : " + tempLocation.getBlockZ(), "Owner : " + tempPlayer.getName()));
             }
             tempItem.setItemMeta(tempMeta);
             Boolean isPublic = true;
-            AtomicReference<Boolean> isAccessible = null;
+            Boolean isAccessible = false;
             if (!plugin.getConfig().getBoolean("waypoints." + key + ".Access.isPublic")) {
                 isPublic = false;
-                plugin.getConfig().getConfigurationSection("waypoints." + key + ".Access.players").getKeys(false).forEach(keyName -> {
-                   if (player.getDisplayName() == keyName.toString()) {
-                       isAccessible.set(true);
-                   } else {
-                       isAccessible.set(false);
-                   }
-                });
+                List<String> listOfPlayers = plugin.getConfig().getStringList("waypoints." + key + ".Access.Players");
+                for (String uuid : listOfPlayers) {
+                    if (player.getUniqueId().equals(UUID.fromString(uuid))) isAccessible = true;
+                }
+                if (UUID.fromString(plugin.getConfig().getString("waypoints." + key + ".Access.Owner")).equals(player.getUniqueId())) {
+                    isAccessible = true;
+                }
             }
             if (radiusEnabled) {
                 if (plugin.getConfig().getLocation("waypoints." + key + ".Location").distance(currentBlock.getLocation()) <= radius) {
-                    if (isPublic || isAccessible.get()) {
+                    if (isPublic || isAccessible) {
                         wloc.add(tempItem);
                     }
                 } else { return; }

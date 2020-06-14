@@ -15,15 +15,16 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class WaypointBeaconsRework extends JavaPlugin implements Listener {
 
-    Plugin plugin = this;
     List<InventoryListeners> listOfListeners = new ArrayList<InventoryListeners>();
+    NamespacedKey wayKey = new NamespacedKey(this, "waypoint_beacon");
 
     public void reloadAllListenersRadius() {
         for (InventoryListeners listener : listOfListeners) {
@@ -54,8 +55,8 @@ public final class WaypointBeaconsRework extends JavaPlugin implements Listener 
             getDataFolder().mkdir();
         }
         saveDefaultConfig();
-        NamespacedKey wayKey = new NamespacedKey(this, "waypoint_beacon");
-        ShapedRecipe wayRecipe = new ShapedRecipe(wayKey, getBeaconItemStack()); wayRecipe.shape(getConfig().getString("settings.recipe.recipeFormat.line1"), getConfig().getString("settings.recipe.recipeFormat.line2"), getConfig().getString("settings.recipe.recipeFormat.line3"));
+        ShapedRecipe wayRecipe = new ShapedRecipe(wayKey, getBeaconItemStack());
+        wayRecipe.shape(getConfig().getString("settings.recipe.recipeFormat.line1"), getConfig().getString("settings.recipe.recipeFormat.line2"), getConfig().getString("settings.recipe.recipeFormat.line3"));
         Object[] listOfRecipeItems = getConfig().getConfigurationSection("settings.recipe.recipeItems").getKeys(false).toArray();
         for (Object recipeItem : listOfRecipeItems) {
             Material tempMaterial = Material.getMaterial(getConfig().getString("settings.recipe.recipeItems." + recipeItem.toString()));
@@ -63,8 +64,13 @@ public final class WaypointBeaconsRework extends JavaPlugin implements Listener 
         }
         Bukkit.addRecipe(wayRecipe);
         WaypointCommands waypointCommandScript = new WaypointCommands();
-        waypointCommandScript.getPlugin(plugin, this);
+        waypointCommandScript.getPlugin(this, this);
         getCommand("waypoints").setExecutor(waypointCommandScript);
+    }
+
+    @Override
+    public void onDisable() {
+        Bukkit.removeRecipe(wayKey);
     }
 
     @EventHandler
@@ -82,7 +88,7 @@ public final class WaypointBeaconsRework extends JavaPlugin implements Listener 
                         ItemMeta tempMeta = tempTeleport.getItemMeta();
                         tempMeta.setDisplayName(ChatColor.GOLD + "Teleport To...");
                         tempTeleport.setItemMeta(tempMeta);
-                        temporaryListener.establishVars(plugin, event.getPlayer(), event.getClickedBlock(), tempTeleport, this);
+                        temporaryListener.establishVars(this, event.getPlayer(), event.getClickedBlock(), tempTeleport, this);
                         getServer().getPluginManager().registerEvents(temporaryListener, this);
                         listOfListeners.add(temporaryListener);
                     }
@@ -112,6 +118,9 @@ public final class WaypointBeaconsRework extends JavaPlugin implements Listener 
             getConfig().set("waypoints." + name + ".Location", location);
             getConfig().set("waypoints." + name + ".Display", "BEACON");
             getConfig().set("waypoints." + name + ".Access.isPublic", true);
+            getConfig().set("waypoints." + name + ".Access.Owner", player.getUniqueId().toString());
+            List<String> tempListing = Arrays.asList(player.getUniqueId().toString());
+            getConfig().set("waypoints." + name + ".Access.Players", tempListing);
             saveConfig();
         }
     }
@@ -127,7 +136,8 @@ public final class WaypointBeaconsRework extends JavaPlugin implements Listener 
                 if (blk.getLocation().equals(getConfig().getLocation("waypoints." + key + ".Location"))) {
                     getConfig().set("waypoints." + key, null);
                     saveConfig();
-                    if (event.getBlock().breakNaturally()) {
+                    if (event.isDropItems()) {
+                        event.getBlock().getDrops().clear();
                         ItemStack wayBeacon = new ItemStack(Material.BEACON, 1);
                         ItemMeta wayBeaconMeta = wayBeacon.getItemMeta();
                         wayBeaconMeta.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "Waypoint Beacon");
@@ -136,8 +146,6 @@ public final class WaypointBeaconsRework extends JavaPlugin implements Listener 
                         wayBeacon.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                         blk.setType(Material.AIR);
                         blk.getLocation().getWorld().dropItemNaturally(blk.getLocation(), wayBeacon);
-                    } else {
-                        blk.setType(Material.AIR);
                     }
                 }
             }
